@@ -164,7 +164,7 @@ legend{font-weight:700;margin-bottom:12px}
 /* TEAM */
 .team{list-style:none;display:flex;flex-wrap:wrap;gap:14px}
 .team li{background:var(--green);color:var(--beige);padding:14px 24px;border-radius:99px;font:600 1.05rem var(--head);letter-spacing:.04em}
-.values{display:flex;flex-wrap:wrap;gap:10px;margin-top:34px}
+.values{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
 .values span{border:1.5px solid var(--red-2);color:var(--red);padding:7px 16px;border-radius:99px;font-weight:600;font-size:.9rem}
 
 /* FOOTER */
