@@ -2,6 +2,7 @@
   'use strict';
   var CFG = window.ECHINATA_CONFIG || {};
   var REMOTE = !!(CFG.supabaseUrl && CFG.supabaseAnonKey);
+  var API = !REMOTE && CFG.apiUrl;   // back-end próprio (funções da Vercel, em memória)
 
   /* ---------- helpers ---------- */
   function $(s, r) { return (r || document).querySelector(s); }
@@ -12,6 +13,13 @@
 
   // Envia para o Supabase (tabela) ou guarda localmente no modo demonstração.
   function send(table, row) {
+    if (API) {
+      return fetch(API + '/' + table, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(row)
+      }).then(function (r) { if (!r.ok) throw new Error('http ' + r.status); });
+    }
     if (REMOTE) {
       return fetch(CFG.supabaseUrl + '/rest/v1/' + table, {
         method: 'POST',
@@ -150,4 +158,10 @@
     }).then(function () { pbtn.disabled = false; });
   });
   render();
+  // com back-end próprio, a contagem vem do servidor (votos de todo mundo)
+  if (API) {
+    fetch(API + '/votos').then(function (r) { return r.json(); }).then(function (d) {
+      tally = d.contagem || {}; render();
+    }).catch(function () {});
+  }
 })();
