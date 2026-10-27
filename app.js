@@ -57,21 +57,100 @@
     els.forEach(function (el) { io.observe(el); });
   } else els.forEach(function (el) { el.classList.add('in'); });
 
-  /* ---------- novidades ---------- */
-  var NEWS = [
-    { tag: 'Projeto', cls: '', date: '2026-09-29', title: 'Plano de ação entregue',
-      text: 'A equipe concluiu o plano de ação com as propostas de Arquitetura, Engenharia Mecânica, Engenharia da Computação e Sistemas de Informação.' },
-    { tag: 'Diagnóstico', cls: 'verde', date: '', title: 'Mapa síntese da praça',
-      text: 'O levantamento no local registrou árvores, bancos, quadras, playground, academia, rampas e pontos de ônibus, além dos principais problemas de conservação.' },
-    { tag: 'Comunidade', cls: 'madeira', date: '', title: 'Um pavilhão para a comunidade',
-      text: 'Entre os critérios de sucesso do projeto está um pavilhão para a confraternização dos moradores e para eventos da Paróquia Santa Mônica.' }
-  ];
+  /* ---------- abas ---------- */
+  var PAGES = ['inicio', 'praca', 'propostas', 'jornal', 'participe', 'sobre'];
+  var ANCHORS = { topo: 'inicio', destaques: 'inicio', ouvidoria: 'participe', votacao: 'participe', equipe: 'sobre', painel: 'sobre', novidades: 'jornal' };
+  var TITLES = { inicio: 'Praça Américo Ferreira de Abreu', praca: 'A praça', propostas: 'Propostas', jornal: 'Jornal da Praça', participe: 'Participe', sobre: 'Sobre' };
+  var pageEls = document.querySelectorAll('.page');
+
+  function route() {
+    var id = decodeURIComponent(location.hash.slice(1)) || 'inicio';
+    var page = PAGES.indexOf(id) > -1 ? id : ANCHORS[id];
+    if (!page) { page = 'inicio'; id = 'inicio'; }
+    Array.prototype.forEach.call(pageEls, function (el) { el.hidden = el.getAttribute('data-page') !== page; });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-nav]'), function (a) {
+      if (a.getAttribute('data-nav') === page) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    });
+    document.title = (page === 'inicio' ? '' : TITLES[page] + ' — ') + 'Praça Américo Ferreira de Abreu — Echinata';
+    var target = id !== page && document.getElementById(id);
+    if (target) target.scrollIntoView(); else window.scrollTo(0, 0);
+  }
+  window.addEventListener('hashchange', route);
+
+  /* ---------- jornal: eventos e notícias ---------- */
+  var J = window.ECHINATA_JORNAL || { eventos: [], noticias: [] };
+  var MESES = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
   var fmt = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
-  $('#news').innerHTML = NEWS.map(function (n) {
-    var t = n.date ? '<time datetime="' + n.date + '">' + fmt.format(new Date(n.date + 'T12:00:00')) + '</time>' : '';
-    return '<article class="post reveal in ' + n.cls + '"><span class="tag">' + esc(n.tag) + '</span><h3>' + esc(n.title) +
-      '</h3><p>' + esc(n.text) + '</p>' + t + '</article>';
+  var fmtLong = new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  function dt(d, t) { return new Date(d + 'T' + (t || '23:59') + ':00'); }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+
+  var now = new Date();
+  var evs = (J.eventos || []).slice().sort(function (a, b) { return dt(a.data, a.hora) - dt(b.data, b.hora); });
+  var upcoming = evs.filter(function (e) { return dt(e.data, e.fim || e.hora) >= now; });
+  var past = evs.filter(function (e) { return dt(e.data, e.fim || e.hora) < now; }).reverse();
+
+  var ed = $('#edition'); if (ed) ed.textContent = fmtLong.format(now);
+
+  function eventCard(e, big) {
+    var d = new Date(e.data + 'T12:00:00');
+    var hora = e.hora ? e.hora.replace(':', 'h') + (e.fim ? ' às ' + e.fim.replace(':', 'h') : '') : '';
+    var wa = 'https://wa.me/?text=' + encodeURIComponent('Você está convidado: ' + e.titulo + ' — ' + fmt.format(d) + (hora ? ', ' + hora : '') + ' · ' + e.local + ' ' + location.origin + '/#jornal');
+    return '<article class="evt reveal in' + (big ? ' big' : '') + '">' +
+      '<div class="date" aria-hidden="true"><b>' + d.getDate() + '</b><span>' + MESES[d.getMonth()] + '</span></div>' +
+      '<div class="evt-body"><p class="meta"><span class="tag">' + esc(e.tipo || 'Evento') + '</span>' +
+      (e.exemplo ? '<span class="tag ex">Exemplo</span>' : '') + '</p>' +
+      '<h3>' + esc(e.titulo) + '</h3>' +
+      '<p class="when"><time datetime="' + e.data + '">' + fmtLong.format(d) + '</time>' + (hora ? ' · ' + hora : '') + '</p>' +
+      '<p class="where">' + esc(e.local || '') + '</p>' +
+      '<p>' + esc(e.texto || '') + '</p>' +
+      '<p class="acts"><button type="button" class="btn btn-primary" data-ics="' + esc(e.id) + '">Adicionar ao calendário</button>' +
+      '<a class="btn btn-line" href="' + wa + '" target="_blank" rel="noopener">Convidar no WhatsApp</a></p></div></article>';
+  }
+
+  function emptyMsg(t) { return '<p class="empty">' + t + '</p>'; }
+  $('#agenda').innerHTML = upcoming.length ? upcoming.map(function (e, i) { return eventCard(e, i === 0); }).join('')
+    : emptyMsg('Nenhum evento marcado por enquanto. Volte em breve!');
+  if (past.length) { $('#pastBox').hidden = false; $('#past').innerHTML = past.map(function (e) { return eventCard(e, false); }).join(''); }
+  $('#homeNext').innerHTML = upcoming.length ? eventCard(upcoming[0], true) : emptyMsg('Ainda não há eventos marcados. Acompanhe o jornal!');
+
+  $('#news').innerHTML = (J.noticias || []).map(function (n) {
+    var t = n.data ? '<time datetime="' + n.data + '">' + fmt.format(new Date(n.data + 'T12:00:00')) + '</time>' : '';
+    return '<article class="post reveal in ' + (n.cor || '') + '"><span class="tag">' + esc(n.tag) + '</span><h3>' + esc(n.titulo) +
+      '</h3><p>' + esc(n.texto) + '</p>' + t + '</article>';
   }).join('');
+
+  // .ics: abre no Google Agenda, Apple Calendário e Outlook (horário de Brasília, UTC-3)
+  function icsDate(d, t) {
+    var p = d.split('-'), h = (t || '00:00').split(':');
+    var u = new Date(Date.UTC(+p[0], +p[1] - 1, +p[2], +h[0] + 3, +h[1]));
+    return u.getUTCFullYear() + pad(u.getUTCMonth() + 1) + pad(u.getUTCDate()) + 'T' + pad(u.getUTCHours()) + pad(u.getUTCMinutes()) + '00Z';
+  }
+  function icsText(s) { return String(s || '').replace(/\\/g, '\\\\').replace(/[,;]/g, '\\$&').replace(/\n/g, '\\n'); }
+  document.addEventListener('click', function (ev) {
+    var b = ev.target.closest && ev.target.closest('[data-ics]');
+    if (!b) return;
+    var e = evs.filter(function (x) { return x.id === b.getAttribute('data-ics'); })[0];
+    if (!e) return;
+    var ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Echinata//Jornal da Praca//PT', 'BEGIN:VEVENT',
+      'UID:' + e.id + '@echinata', 'DTSTAMP:' + icsDate(now.toISOString().slice(0, 10), '00:00'),
+      'DTSTART:' + icsDate(e.data, e.hora || '00:00'), 'DTEND:' + icsDate(e.data, e.fim || e.hora || '23:00'),
+      'SUMMARY:' + icsText(e.titulo), 'LOCATION:' + icsText(e.local), 'DESCRIPTION:' + icsText(e.texto), 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' }));
+    a.download = e.id + '.ics'; document.body.appendChild(a); a.click(); a.remove();
+  });
+
+  // filtros do jornal
+  var fbtns = document.querySelectorAll('.fbtn');
+  Array.prototype.forEach.call(fbtns, function (b) {
+    b.addEventListener('click', function () {
+      var f = b.getAttribute('data-f');
+      Array.prototype.forEach.call(fbtns, function (x) { var on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-pressed', on); });
+      $('#blkEventos').hidden = f === 'noticias';
+      $('#blkNoticias').hidden = f === 'eventos';
+    });
+  });
 
   /* ---------- ouvidoria ---------- */
   function wireForm(form, msgEl, table, build, validate) {
@@ -158,6 +237,7 @@
     }).then(function () { pbtn.disabled = false; });
   });
   render();
+  route();
   // com back-end próprio, a contagem vem do servidor (votos de todo mundo)
   if (API) {
     fetch(API + '/votos').then(function (r) { return r.json(); }).then(function (d) {

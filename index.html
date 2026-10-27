@@ -18,23 +18,24 @@
 <body>
 
 <header class="nav" id="nav">
-  <a class="brand" href="#topo" aria-label="Echinata — início">
+  <a class="brand" href="#inicio" aria-label="Echinata — início">
     <img src="assets/logo-symbol.png" alt="" width="40" height="40">
     <span>ECHINATA</span>
   </a>
   <button class="burger" id="burger" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu"><i></i><i></i><i></i></button>
   <nav id="menu" class="menu">
-    <a href="#praca">A praça</a>
-    <a href="#propostas">Propostas</a>
-    <a href="#novidades">Novidades</a>
-    <a href="#ouvidoria">Ouvidoria</a>
-    <a href="#votacao">Participe</a>
-    <a href="#equipe">Equipe</a>
+    <a href="#inicio" data-nav="inicio">Início</a>
+    <a href="#praca" data-nav="praca">A praça</a>
+    <a href="#propostas" data-nav="propostas">Propostas</a>
+    <a href="#jornal" data-nav="jornal">Jornal</a>
+    <a href="#participe" data-nav="participe">Participe</a>
+    <a href="#sobre" data-nav="sobre">Sobre</a>
   </nav>
 </header>
 
 <main id="topo">
 
+<div class="page" id="p-inicio" data-page="inicio" hidden>
 <!-- HERO -->
 <section class="hero">
   <div class="hero-bands" aria-hidden="true"><span></span><span></span></div>
@@ -45,14 +46,14 @@
       <p class="lead">Estamos repensando a Praça Américo Ferreira de Abreu com acessibilidade, natureza e tecnologia. E a sua voz é parte do projeto.</p>
       <div class="cta">
         <a class="btn btn-primary" href="#ouvidoria">Relatar um problema</a>
-        <a class="btn btn-ghost" href="#propostas">Ver as propostas</a>
+        <a class="btn btn-ghost" href="#jornal">Ver o jornal</a>
       </div>
     </div>
     <div class="hero-mark reveal">
       <img src="assets/logo-symbol.png" alt="Símbolo da Echinata: corte do tronco do pau-brasil com uma praça desenhada no centro" width="520" height="520">
     </div>
   </div>
-  <a class="scroll-hint" href="#praca" aria-label="Rolar para a próxima seção"><span></span></a>
+  <a class="scroll-hint" href="#destaques" aria-label="Rolar para os destaques"><span></span></a>
 </section>
 
 <!-- NÚMEROS -->
@@ -65,6 +66,22 @@
   </div>
 </section>
 
+<!-- DESTAQUES -->
+<section class="sec" id="destaques">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="eyebrow dark">Jornal da Praça</p>
+      <h2>O que vem por aí</h2>
+      <p>Eventos, convites e novidades da praça, direto no jornal.</p>
+    </div>
+    <div id="homeNext"></div>
+    <p class="more"><a class="btn btn-primary" href="#jornal">Abrir o jornal completo</a></p>
+  </div>
+</section>
+
+</div>
+
+<div class="page" id="p-praca" data-page="praca" hidden>
 <!-- A PRAÇA -->
 <section class="sec" id="praca">
   <div class="wrap">
@@ -100,6 +117,9 @@
   </div>
 </section>
 
+</div>
+
+<div class="page" id="p-propostas" data-page="propostas" hidden>
 <!-- PROPOSTAS -->
 <section class="sec dark" id="propostas">
   <div class="diag" aria-hidden="true"></div>
@@ -160,18 +180,43 @@
   </div>
 </section>
 
-<!-- NOVIDADES -->
-<section class="sec" id="novidades">
+</div>
+
+<div class="page" id="p-jornal" data-page="jornal" hidden>
+<!-- JORNAL -->
+<section class="sec paper" id="jornal">
   <div class="wrap">
-    <div class="sec-head reveal">
-      <p class="eyebrow dark">Central de novidades</p>
-      <h2>Fique por dentro</h2>
-      <p>Atualizações do projeto e da praça, num só lugar.</p>
+    <header class="masthead reveal in">
+      <p class="dateline"><span>Uberlândia, MG</span><span id="edition"></span><span>Edição digital</span></p>
+      <h2>Jornal da Praça</h2>
+      <p class="sub">Convites, agenda de eventos e notícias da Praça Américo Ferreira de Abreu</p>
+    </header>
+
+    <div class="filters" role="group" aria-label="Filtrar o jornal">
+      <button type="button" class="fbtn on" data-f="tudo" aria-pressed="true">Tudo</button>
+      <button type="button" class="fbtn" data-f="eventos" aria-pressed="false">Eventos</button>
+      <button type="button" class="fbtn" data-f="noticias" aria-pressed="false">Notícias</button>
     </div>
-    <div class="news" id="news"></div>
+
+    <div id="blkEventos">
+      <h3 class="blk-title">Agenda · próximos eventos</h3>
+      <div id="agenda" class="agenda"></div>
+      <details class="past" id="pastBox" hidden>
+        <summary>Eventos que já aconteceram</summary>
+        <div id="past" class="agenda"></div>
+      </details>
+    </div>
+
+    <div id="blkNoticias">
+      <h3 class="blk-title">Notícias</h3>
+      <div class="news" id="news"></div>
+    </div>
   </div>
 </section>
 
+</div>
+
+<div class="page" id="p-participe" data-page="participe" hidden>
 <!-- OUVIDORIA -->
 <section class="sec tint" id="ouvidoria">
   <div class="wrap two">
@@ -266,6 +311,23 @@
   </div>
 </section>
 
+</div>
+
+<div class="page" id="p-sobre" data-page="sobre" hidden>
+<!-- EQUIPE -->
+<section class="sec" id="equipe">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="eyebrow dark">Quem somos</p>
+      <h2>Echinata</h2>
+      <p>Arquitetura e urbanismo sustentáveis. O nome vem do pau-brasil (<i>Paubrasilia echinata</i>), símbolo de origem, identidade e território. Nosso símbolo é um corte do tronco que guarda uma praça viva e humanizada no centro.</p>
+    </div>
+    <div class="values reveal">
+      <span>Sustentabilidade</span><span>Humanização</span><span>Integração</span><span>Inovação</span><span>Identidade</span><span>Responsabilidade</span>
+    </div>
+  </div>
+</section>
+
 <!-- PAINEL -->
 <section class="sec dark" id="painel">
   <div class="wrap">
@@ -284,19 +346,7 @@
   </div>
 </section>
 
-<!-- EQUIPE -->
-<section class="sec" id="equipe">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <p class="eyebrow dark">Quem somos</p>
-      <h2>Echinata</h2>
-      <p>Arquitetura e urbanismo sustentáveis. O nome vem do pau-brasil (<i>Paubrasilia echinata</i>), símbolo de origem, identidade e território. Nosso símbolo é um corte do tronco que guarda uma praça viva e humanizada no centro.</p>
-    </div>
-    <div class="values reveal">
-      <span>Sustentabilidade</span><span>Humanização</span><span>Integração</span><span>Inovação</span><span>Identidade</span><span>Responsabilidade</span>
-    </div>
-  </div>
-</section>
+</div>
 
 </main>
 
@@ -312,6 +362,7 @@
 </footer>
 
 <script src="config.js"></script>
+<script src="jornal.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
