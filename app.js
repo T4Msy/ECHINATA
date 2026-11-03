@@ -48,6 +48,17 @@
     if (e.target.tagName === 'A') { menu.classList.remove('open'); burger.setAttribute('aria-expanded', false); }
   });
 
+  /* ---------- fotos ainda não enviadas: espaço reservado com legenda ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll('.photo img'), function (img) {
+    function missing() {
+      var fig = img.parentNode;
+      fig.setAttribute('data-label', img.alt + ' (' + img.getAttribute('src') + ')');
+      fig.classList.add('missing');
+      img.remove();
+    }
+    if (img.complete && !img.naturalWidth) missing(); else img.addEventListener('error', missing);
+  });
+
   /* ---------- reveal ao rolar ---------- */
   var els = document.querySelectorAll('.reveal');
   if ('IntersectionObserver' in window) {
@@ -58,9 +69,9 @@
   } else els.forEach(function (el) { el.classList.add('in'); });
 
   /* ---------- abas ---------- */
-  var PAGES = ['inicio', 'praca', 'propostas', 'jornal', 'participe', 'sobre'];
-  var ANCHORS = { topo: 'inicio', destaques: 'inicio', ouvidoria: 'participe', votacao: 'participe', equipe: 'sobre', painel: 'sobre', novidades: 'jornal' };
-  var TITLES = { inicio: 'Praça Américo Ferreira de Abreu', praca: 'A praça', propostas: 'Propostas', jornal: 'Jornal da Praça', participe: 'Participe', sobre: 'Sobre' };
+  var PAGES = ['inicio', 'historia', 'praca', 'propostas', 'jornal', 'participe', 'sobre'];
+  var ANCHORS = { topo: 'inicio', destaques: 'inicio', ouvidoria: 'participe', votacao: 'participe', equipe: 'sobre', painel: 'sobre', novidades: 'jornal', cultura: 'historia', memorias: 'historia', transformacoes: 'historia' };
+  var TITLES = { inicio: 'Praça Américo Ferreira de Abreu', historia: 'História', praca: 'A praça', propostas: 'Propostas', jornal: 'Jornal da Praça', participe: 'Participe', sobre: 'Sobre' };
   var pageEls = document.querySelectorAll('.page');
 
   function route() {
