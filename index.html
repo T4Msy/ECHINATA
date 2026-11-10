@@ -28,6 +28,7 @@
     <a href="#historia" data-nav="historia">História</a>
     <a href="#praca" data-nav="praca">A praça</a>
     <a href="#propostas" data-nav="propostas">Propostas</a>
+    <a href="#praca3d" data-nav="praca3d">Praça 3D</a>
     <a href="#jornal" data-nav="jornal">Jornal</a>
     <a href="#participe" data-nav="participe">Participe</a>
     <a href="#sobre" data-nav="sobre">Sobre</a>
@@ -330,6 +331,58 @@
 
 </div>
 
+<div class="page" id="p-praca3d" data-page="praca3d" hidden>
+<!-- PRAÇA 3D -->
+<section class="sec dark sec3d" id="praca3d">
+  <div class="diag" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="sec-head reveal in">
+      <p class="eyebrow">A proposta em 3D</p>
+      <h2>Passeie pela nova praça</h2>
+      <p>Gire, aproxime e toque nas letras para conhecer cada intervenção. Os números mostram onde fica cada planta do Jardim do Cerrado.</p>
+    </div>
+    <div class="viewer">
+      <div class="stage" id="stage">
+        <div class="stage-canvas" id="stageCanvas"></div>
+        <div class="hotspots" id="hotspots"></div>
+        <p class="stage-loading" id="stageLoading">Carregando o modelo 3D <b>0%</b></p>
+        <div class="ctrls">
+          <button type="button" id="btnHome">Visão geral</button>
+          <button type="button" id="btnTour">Tour automático</button>
+          <button type="button" id="togglePlants" class="on" aria-pressed="true">Plantas</button>
+          <button type="button" id="btnFull">Tela cheia</button>
+        </div>
+        <div class="spot-card" id="spotCard" hidden></div>
+      </div>
+      <aside class="side">
+        <h3>Intervenções</h3>
+        <ul class="spot-list" id="spotList"></ul>
+        <p class="info">Arraste para girar, use dois dedos ou a roda do mouse para aproximar. Modelo do grupo feito no SketchUp.</p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- JARDIM DO CERRADO -->
+<section class="sec tint" id="jardim">
+  <div class="wrap">
+    <div class="sec-head reveal in">
+      <p class="eyebrow dark">Paisagismo</p>
+      <h2>Jardim do Cerrado</h2>
+      <p>12 espécies escolhidas para dar sombra, cor e identidade à praça, a maioria nativa do Cerrado. O pau-brasil, no centro do pavilhão, é o símbolo da Echinata.</p>
+    </div>
+    <div class="filters left" role="group" aria-label="Filtrar plantas">
+      <button type="button" class="fbtn on" data-pf="todas" aria-pressed="true">Todas (12)</button>
+      <button type="button" class="fbtn" data-pf="arvore" aria-pressed="false">Árvores (6)</button>
+      <button type="button" class="fbtn" data-pf="jardim" aria-pressed="false">Arbustos e gramíneas (6)</button>
+    </div>
+    <div class="plants" id="plantGrid"></div>
+    <p class="note dark-note">Imagens ilustrativas das espécies. Referências botânicas: Embrapa, manuais de arborização e Flora do Brasil.</p>
+  </div>
+</section>
+
+</div>
+
 <div class="page" id="p-jornal" data-page="jornal" hidden>
 <!-- JORNAL -->
 <section class="sec paper" id="jornal">
@@ -480,17 +533,23 @@
 <section class="sec dark" id="painel">
   <div class="wrap">
     <div class="sec-head reveal">
-      <p class="eyebrow">Em breve</p>
+      <p class="eyebrow">Simulação dos sensores</p>
       <h2>A praça conectada</h2>
-      <p>Com os sensores instalados, esta página mostrará as condições da praça em tempo real, para você escolher o melhor horário de ir.</p>
+      <p>Assim vai funcionar o painel quando os sensores estiverem instalados: temperatura, umidade e movimento em tempo real, e o pergolado abrindo sozinho quando o sol aperta.</p>
+    </div>
+    <div class="sim-ctrl reveal" role="group" aria-label="Horário simulado">
+      <label for="simHora">Horário simulado: <b id="simHoraTxt">--</b></label>
+      <input type="range" id="simHora" min="0" max="23.75" step="0.25">
+      <button type="button" class="fbtn on" id="simAuto" aria-pressed="true">Acompanhar o relógio</button>
     </div>
     <div class="gauges reveal">
-      <div><span class="g-label">Temperatura</span><b>-- °C</b></div>
-      <div><span class="g-label">Umidade</span><b>-- %</b></div>
-      <div><span class="g-label">Movimento</span><b>--</b></div>
-      <div><span class="g-label">Pergolado</span><b>--</b></div>
+      <div><span class="g-label">Temperatura</span><b id="gTemp">-- °C</b><small id="gTempS"></small></div>
+      <div><span class="g-label">Umidade</span><b id="gUmid">-- %</b><small id="gUmidS"></small></div>
+      <div><span class="g-label">Movimento</span><b id="gMov">--</b><small>pessoas na última hora</small></div>
+      <div class="pg" id="gPerg"><span class="g-label">Pergolado</span><b id="gPergT">--</b><small id="gPergS"></small></div>
     </div>
-    <p class="note">Valores ilustrativos de layout. Os dados reais virão dos sensores da proposta de Engenharia da Computação.</p>
+    <div class="spark reveal"><canvas id="simChart" height="160" aria-label="Temperatura simulada ao longo do dia"></canvas></div>
+    <p class="note">Dados simulados a partir do clima típico de Uberlândia. Regra do pergolado: abre quando a temperatura passa de 30 °C ou a radiação solar fica alta, e recolhe à noite ou com chuva. Os dados reais virão dos sensores da proposta de Engenharia da Computação.</p>
   </div>
 </section>
 
@@ -512,5 +571,9 @@
 <script src="config.js"></script>
 <script src="jornal.js"></script>
 <script src="app.js"></script>
+<script src="sensores.js"></script>
+<script src="plantas.js"></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module" src="praca3d.js"></script>
 </body>
 </html>

@@ -69,9 +69,9 @@
   } else els.forEach(function (el) { el.classList.add('in'); });
 
   /* ---------- abas ---------- */
-  var PAGES = ['inicio', 'historia', 'praca', 'propostas', 'jornal', 'participe', 'sobre'];
-  var ANCHORS = { topo: 'inicio', destaques: 'inicio', ouvidoria: 'participe', votacao: 'participe', equipe: 'sobre', painel: 'sobre', novidades: 'jornal', cultura: 'historia', memorias: 'historia', transformacoes: 'historia' };
-  var TITLES = { inicio: 'Praça Américo Ferreira de Abreu', historia: 'História', praca: 'A praça', propostas: 'Propostas', jornal: 'Jornal da Praça', participe: 'Participe', sobre: 'Sobre' };
+  var PAGES = ['inicio', 'historia', 'praca', 'propostas', 'praca3d', 'jornal', 'participe', 'sobre'];
+  var ANCHORS = { topo: 'inicio', destaques: 'inicio', ouvidoria: 'participe', votacao: 'participe', equipe: 'sobre', painel: 'sobre', novidades: 'jornal', cultura: 'historia', memorias: 'historia', transformacoes: 'historia', jardim: 'praca3d' };
+  var TITLES = { inicio: 'Praça Américo Ferreira de Abreu', historia: 'História', praca: 'A praça', propostas: 'Propostas', praca3d: 'Praça 3D', jornal: 'Jornal da Praça', participe: 'Participe', sobre: 'Sobre' };
   var pageEls = document.querySelectorAll('.page');
 
   function route() {
