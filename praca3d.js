@@ -48,18 +48,18 @@ function start() {
 }
 
 function init() {
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
+  renderer.shadowMap.autoUpdate = false; // cena estática: a sombra é calculada uma vez só
   canvasWrap.appendChild(renderer.domElement);
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#dfe8ec');
-  scene.fog = new THREE.Fog('#dfe8ec', 260, 520);
   const camera = new THREE.PerspectiveCamera(40, 1, 0.5, 1500);
 
   scene.add(new THREE.HemisphereLight('#ffffff', '#6f6a55', 1.6));
@@ -101,8 +101,12 @@ function init() {
     showPlants = !showPlants;
     e.currentTarget.classList.toggle('on', showPlants);
     e.currentTarget.setAttribute('aria-pressed', showPlants);
+    dirty = true;
   });
 
+  // renderiza só quando algo muda (câmera, animação, redimensionamento)
+  let dirty = true;
+  controls.addEventListener('change', () => { dirty = true; });
   const home = { pos: new THREE.Vector3(), target: new THREE.Vector3() };
   let anim = null;
   function flyTo(pos, target, ms) {
@@ -149,7 +153,7 @@ function init() {
 
   function resize() {
     const w = canvasWrap.clientWidth, h = canvasWrap.clientHeight;
-    renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+    renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); dirty = true;
   }
   new ResizeObserver(resize).observe(canvasWrap);
   resize();
@@ -171,6 +175,8 @@ function init() {
     const c = box.getCenter(new THREE.Vector3());
     model.position.set(-c.x + PRACA.dx, -box.min.y, -c.z + PRACA.dz);
     scene.add(model);
+    model.updateMatrixWorld(true);
+    model.traverse(o => { o.matrixAutoUpdate = false; });
     const size = new THREE.Vector3(PRACA.w, box.max.y - box.min.y, PRACA.d);
     // planta (px, 740 x 860) -> mundo: modelo girado 180° em relação à planta
     cal.sx = -PRACA.w / 704; cal.sz = -PRACA.d / 824; cal.ox = 370 * PRACA.w / 704; cal.oz = 430 * PRACA.d / 824;
@@ -182,6 +188,9 @@ function init() {
     home.target.set(0, 0, 0);
     home.pos.set(r * 0.62, r * 0.62, r * 0.78);
     camera.position.copy(home.pos); controls.target.copy(home.target); controls.update();
+    renderer.shadowMap.needsUpdate = true;
+    renderer.compile(scene, camera);
+    dirty = true;
     loading.hidden = true;
     stage.classList.add('ready');
   }, ev => {
@@ -192,12 +201,15 @@ function init() {
   function tick(now) {
     requestAnimationFrame(tick);
     if (!isVisible()) return;
+    let changed = dirty; dirty = false;
     if (anim) {
+      changed = true;
       let k = Math.min(1, (now - anim.t0) / anim.ms); k = k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
       camera.position.lerpVectors(anim.p0, anim.p1, k); controls.target.lerpVectors(anim.t0v, anim.t1, k);
       if (k >= 1) anim = null;
     }
-    controls.update();
+    if (controls.update()) changed = true;
+    if (!changed) return;
     renderer.render(scene, camera);
     const w = canvasWrap.clientWidth, h = canvasWrap.clientHeight;
     spots.forEach(s => {
