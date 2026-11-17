@@ -5,7 +5,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 
 const DATA = window.ECHINATA_PRACA || { pontos: [], plantas: [] };
-const PRACA = { w: 114, d: 131.8, dx: 0.2, dz: -19.2 }; // medidas da praça no modelo (m)
+const PRACA = { w: 113.8, d: 131.8, dx: 0.1, dz: -19.2 }; // medidas da praça no modelo (m)
 const $ = (s, r) => (r || document).querySelector(s);
 const esc = s => { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; };
 
@@ -92,7 +92,7 @@ function init() {
     hotLayer.appendChild(el);
     spots.push({ key, el, x, y, h, info, pos: new THREE.Vector3(), cls });
   }
-  DATA.pontos.forEach(p => addSpot(p.id, p.id, 'ponto', p.x, p.y, 6, { titulo: p.titulo, texto: p.texto, area: p.area }));
+  DATA.pontos.forEach(p => addSpot(p.id, p.id, 'ponto', p.x, p.y, p.h || 6, { titulo: p.titulo, texto: p.texto, area: p.area }));
   DATA.plantas.forEach(p => addSpot('p' + p.n, String(p.n), 'planta', p.x, p.y, p.tipo === 'arvore' ? 7 : 2,
     { titulo: p.nome, sub: p.sci, texto: p.local, area: p.tipo === 'arvore' ? 'Árvore do Jardim do Cerrado' : 'Jardim do Cerrado', img: p.img }));
 
@@ -170,7 +170,7 @@ function init() {
       }
     });
     // centraliza a praça na origem, com o chão em y = 0.
-    // O arquivo traz um objeto solto ao norte; a praça fica 19,2 m ao sul do centro da caixa.
+    // O arquivo traz ruas em volta e um objeto solto ao norte; a praça fica 19,2 m ao sul do centro da caixa.
     const box = new THREE.Box3().setFromObject(model, true);
     const c = box.getCenter(new THREE.Vector3());
     model.position.set(-c.x + PRACA.dx, -box.min.y, -c.z + PRACA.dz);
@@ -178,8 +178,8 @@ function init() {
     model.updateMatrixWorld(true);
     model.traverse(o => { o.matrixAutoUpdate = false; });
     const size = new THREE.Vector3(PRACA.w, box.max.y - box.min.y, PRACA.d);
-    // planta (px, 740 x 860) -> mundo: modelo girado 180° em relação à planta
-    cal.sx = -PRACA.w / 704; cal.sz = -PRACA.d / 824; cal.ox = 370 * PRACA.w / 704; cal.oz = 430 * PRACA.d / 824;
+    // planta (px, 740 x 860) -> mundo: modelo na mesma orientação da planta
+    cal.sx = PRACA.w / 704; cal.sz = PRACA.d / 824; cal.ox = -370 * PRACA.w / 704; cal.oz = -430 * PRACA.d / 824;
     spots.forEach(s => s.pos.copy(toWorld(s.x, s.y, s.h)));
 
     const r = Math.max(size.x, size.z);
