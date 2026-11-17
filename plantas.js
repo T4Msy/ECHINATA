@@ -14,8 +14,12 @@ window.ECHINATA_PRACA = {
       texto: 'Área infantil com brinquedos sobre piso de areia, perto de bancos e da sombra das árvores.' },
     { id: 'F', titulo: 'Academia ao ar livre', area: 'Arquitetura', x: 623, y: 423,
       texto: 'Aparelhos de exercício renovados, com canteiros de jacarandá-do-cerrado em volta para as pausas de descanso.' },
-    { id: 'G', titulo: 'Quiosques e convivência', area: 'Arquitetura · Sistemas de Informação', x: 574, y: 712,
-      texto: 'Apoio para feiras, quermesses e o Julinão. Próximo daqui fica o totem digital com as condições da praça em tempo real.' }
+    { id: 'G', titulo: 'Banheiros', area: 'Arquitetura', x: 574, y: 712,
+      texto: 'Banheiros masculino e feminino novos, com acesso adequado. A falta de banheiros em boas condições foi um dos problemas levantados no diagnóstico.' },
+    { id: 'H', titulo: 'Câmeras de segurança', area: 'Eng. da Computação · Sistemas de Informação', x: 470, y: 515, h: 4,
+      texto: 'Câmeras nos postes cobrem o pavilhão, os caminhos e os acessos (o campo de visão aparece no modelo). Respondem ao pedido dos moradores por mais segurança e podem alimentar o painel da praça.' },
+    { id: 'I', titulo: 'Travessias seguras', area: 'Arquitetura', x: 669, y: 874, h: 2,
+      texto: 'Faixas de pedestre nas ruas em volta da praça, ligando as calçadas às entradas e facilitando a chegada a pé.' }
   ],
   plantas: [
     { n: 1, tipo: 'arvore', nome: 'Jacarandá-do-cerrado', sci: 'Dalbergia miscolobium', img: 'jacaranda-do-cerrado', cor: '#7f8f3a', x: 680, y: 470,
